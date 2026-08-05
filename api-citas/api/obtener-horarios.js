@@ -16,7 +16,12 @@ module.exports = async (req, res) => {
       .single();
 
     if (errServicio || !servicio) {
-      return res.status(200).json({ error: 'No encontré ese servicio.' });
+      console.error('Error buscando servicio:', errServicio);
+      return res.status(200).json({
+        error: 'No encontré ese servicio.',
+        debug_error: errServicio ? errServicio.message : 'servicio es null/undefined',
+        debug_negocio_id: NEGOCIO_ID,
+      });
     }
 
     // Proveedores activos (todos, o uno específico si se pidió)
