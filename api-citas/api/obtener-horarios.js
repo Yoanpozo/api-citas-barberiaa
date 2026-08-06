@@ -7,6 +7,12 @@ module.exports = async (req, res) => {
 
     // Buscar el servicio por nombre (el agente manda el nombre que dijo
     // el cliente: "corte", "barba", etc.)
+    // DEBUG: primero probamos sin ningún filtro, para aislar si el
+    // problema es de permisos generales o de los filtros específicos.
+    const { data: todosSinFiltro, error: errSinFiltro } = await supabase
+      .from('servicios')
+      .select('id, nombre, negocio_id');
+
     const { data: serviciosEncontrados, error: errServicio } = await supabase
       .from('servicios')
       .select('id, nombre, duracion_min, negocio_id')
@@ -22,6 +28,9 @@ module.exports = async (req, res) => {
         debug_negocio_id_longitud: NEGOCIO_ID ? NEGOCIO_ID.length : 0,
         debug_cuantos_encontro: serviciosEncontrados ? serviciosEncontrados.length : 'null',
         debug_filas: serviciosEncontrados,
+        debug_sin_filtro_error: errSinFiltro ? errSinFiltro.message : null,
+        debug_sin_filtro_cuantos: todosSinFiltro ? todosSinFiltro.length : 'null',
+        debug_sin_filtro_filas: todosSinFiltro,
       });
     }
 
