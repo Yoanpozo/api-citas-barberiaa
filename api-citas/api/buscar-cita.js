@@ -1,8 +1,9 @@
 const { supabase, NEGOCIO_ID } = require('../lib/supabase');
+const { obtenerArgs } = require('../lib/parseBody');
 
 module.exports = async (req, res) => {
   try {
-    const { cliente_telefono } = req.body?.args || req.body || {};
+    const { cliente_telefono } = obtenerArgs(req);
 
     const { data: cliente } = await supabase
       .from('clientes')
