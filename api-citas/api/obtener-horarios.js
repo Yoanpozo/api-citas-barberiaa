@@ -7,22 +7,25 @@ module.exports = async (req, res) => {
 
     // Buscar el servicio por nombre (el agente manda el nombre que dijo
     // el cliente: "corte", "barba", etc.)
-    const { data: servicio, error: errServicio } = await supabase
+    const { data: serviciosEncontrados, error: errServicio } = await supabase
       .from('servicios')
-      .select('id, nombre, duracion_min')
+      .select('id, nombre, duracion_min, negocio_id')
       .eq('negocio_id', NEGOCIO_ID)
-      .ilike('nombre', `%${servicio_nombre}%`)
-      .limit(1)
-      .single();
+      .ilike('nombre', `%${servicio_nombre}%`);
 
-    if (errServicio || !servicio) {
+    if (errServicio || !serviciosEncontrados || serviciosEncontrados.length !== 1) {
       console.error('Error buscando servicio:', errServicio);
       return res.status(200).json({
         error: 'No encontré ese servicio.',
-        debug_error: errServicio ? errServicio.message : 'servicio es null/undefined',
+        debug_error: errServicio ? errServicio.message : null,
         debug_negocio_id: NEGOCIO_ID,
+        debug_negocio_id_longitud: NEGOCIO_ID ? NEGOCIO_ID.length : 0,
+        debug_cuantos_encontro: serviciosEncontrados ? serviciosEncontrados.length : 'null',
+        debug_filas: serviciosEncontrados,
       });
     }
+
+    const servicio = serviciosEncontrados[0];
 
     // Proveedores activos (todos, o uno específico si se pidió)
     let query = supabase
