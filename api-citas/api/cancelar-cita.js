@@ -1,8 +1,9 @@
 const { supabase } = require('../lib/supabase');
+const { obtenerArgs } = require('../lib/parseBody');
 
 module.exports = async (req, res) => {
   try {
-    const { cita_id } = req.body?.args || req.body || {};
+    const { cita_id } = obtenerArgs(req);
 
     const { error } = await supabase
       .from('citas')
