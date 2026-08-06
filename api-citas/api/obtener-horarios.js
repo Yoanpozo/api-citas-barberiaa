@@ -7,11 +7,22 @@ module.exports = async (req, res) => {
 
     // Buscar el servicio por nombre (el agente manda el nombre que dijo
     // el cliente: "corte", "barba", etc.)
-    // DEBUG: primero probamos sin ningún filtro, para aislar si el
-    // problema es de permisos generales o de los filtros específicos.
+    // DEBUG: primero probamos sin ningún filtro
     const { data: todosSinFiltro, error: errSinFiltro } = await supabase
       .from('servicios')
       .select('id, nombre, negocio_id');
+
+    // DEBUG: solo filtro de negocio_id
+    const { data: soloNegocio, error: errSoloNegocio } = await supabase
+      .from('servicios')
+      .select('id, nombre, negocio_id')
+      .eq('negocio_id', NEGOCIO_ID);
+
+    // DEBUG: solo filtro de nombre
+    const { data: soloNombre, error: errSoloNombre } = await supabase
+      .from('servicios')
+      .select('id, nombre, negocio_id')
+      .ilike('nombre', `%${servicio_nombre}%`);
 
     const { data: serviciosEncontrados, error: errServicio } = await supabase
       .from('servicios')
@@ -23,14 +34,13 @@ module.exports = async (req, res) => {
       console.error('Error buscando servicio:', errServicio);
       return res.status(200).json({
         error: 'No encontré ese servicio.',
-        debug_error: errServicio ? errServicio.message : null,
         debug_negocio_id: NEGOCIO_ID,
-        debug_negocio_id_longitud: NEGOCIO_ID ? NEGOCIO_ID.length : 0,
-        debug_cuantos_encontro: serviciosEncontrados ? serviciosEncontrados.length : 'null',
-        debug_filas: serviciosEncontrados,
-        debug_sin_filtro_error: errSinFiltro ? errSinFiltro.message : null,
+        debug_servicio_nombre_recibido: servicio_nombre,
+        debug_solo_negocio_cuantos: soloNegocio ? soloNegocio.length : 'null',
+        debug_solo_negocio_error: errSoloNegocio ? errSoloNegocio.message : null,
+        debug_solo_nombre_cuantos: soloNombre ? soloNombre.length : 'null',
+        debug_solo_nombre_error: errSoloNombre ? errSoloNombre.message : null,
         debug_sin_filtro_cuantos: todosSinFiltro ? todosSinFiltro.length : 'null',
-        debug_sin_filtro_filas: todosSinFiltro,
       });
     }
 
