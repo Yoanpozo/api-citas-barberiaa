@@ -1,4 +1,5 @@
 const { supabase, NEGOCIO_ID } = require('../lib/supabase');
+const { obtenerArgs } = require('../lib/parseBody');
 
 module.exports = async (req, res) => {
   try {
@@ -8,7 +9,7 @@ module.exports = async (req, res) => {
       hora_inicio,       // ISO string
       cliente_telefono,
       cliente_nombre,
-    } = req.body?.args || req.body || {};
+    } = obtenerArgs(req);
 
     // 1. Buscar o crear el cliente (identificado por teléfono + negocio)
     let { data: cliente } = await supabase
